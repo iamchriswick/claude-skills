@@ -15,7 +15,7 @@ Every skill in `skills/<skill-name>/` is developed, tested and released on its o
 | Topic | Decision | Source |
 |---|---|---|
 | Branch model | GitHub flow: `main` is the only long-lived branch. No `develop` | User, 2026-10-23 |
-| Reaching `main` | Pull request on GitHub. `main` is protected and CI must pass. PRs merge with a merge commit, not a squash | User, 2026-10-23 |
+| Reaching `main` | Skill branches: pull request on GitHub, CI must pass, merged with a merge commit. Repository branches: merged locally with a merge commit and pushed by the agent; the owner may bypass `main`'s protection | User, 2026-10-23 |
 | Versions | One version per skill, released and tagged on its own | User, 2026-10-23 |
 | First version | `0.1.0` for each skill | User, 2026-10-23 |
 | Commit messages | Conventional Commits with `@commitlint/config-conventional`'s 11 types; `fix` is the only fix type | User, 2026-10-23 |
@@ -46,6 +46,7 @@ Every skill in `skills/<skill-name>/` is developed, tested and released on its o
 
   `hotfix/` only marks urgency. It follows the same path as every other branch.
 - **Merge commits:** every commit on a branch lands on `main`. This keeps create-plan's per-task commits, and release-please reads each one.
+- **Repository branches** (`<type>/<desc>`, no changes under `skills/`) are merged into `main` locally with `--no-ff` and pushed after `pnpm test` passes. Every branch that changes `skills/` goes through a pull request.
 - **Versioning:** release-please (`googleapis/release-please-action`) runs in manifest mode with one component per `skills/<skill-name>/`.
   - **Which skill a commit belongs to:** decided by the paths it touches. The commit scope is for readers.
   - **Bumps:** `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE:` → major. Other types don't bump.
@@ -151,7 +152,7 @@ The release workflow uses a GitHub App token or a fine-grained personal access t
 
 A root `CLAUDE.md` records the conventions agents follow here, so create-plan and other skills can rely on them:
 - `main` is the base branch, and the branch names and commit format above apply;
-- PRs only, merged with merge commits, and `main` is protected;
+- skill branches through PRs and repository branches merged locally, both with merge commits; `main` is protected;
 - the commands: `pnpm install`, `pnpm test`, and the benchmark check;
 - the agent never opens or merges a PR for a branch that changes a skill until that skill has been evaluated. When the user says the branch is ready to merge, the agent asks whether to run `evaluate my <skill-name> skill with skill-creator`. It never starts an evaluation on its own, and records the result with `pnpm eval:record`;
 - the rule that the eval workspace (`skills/*-workspace/`) is never committed.
@@ -175,9 +176,8 @@ The `.gitignore` adds:
 
 ## Steps only the user can do
 
-- **Protect `main`** on GitHub: require a PR, require the CI checks, block direct pushes and force pushes.
+- **Protect `main`** on GitHub: require a PR and the CI checks, block force pushes, and allow administrators to bypass the rule so repository work can be pushed directly.
 - **Create the release token** (a GitHub App or a fine-grained personal access token) and save it as a repository secret.
-- **Allow GitHub Actions to create pull requests**, under Settings → Actions → General.
 - **Approve and merge** each release PR.
 
 ## Not in scope

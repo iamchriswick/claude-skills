@@ -1,7 +1,7 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { skillHash } from "../scripts/skill-hash.mjs";
 
 const skillMd = (version: string, body = "Do the thing.") =>
@@ -9,9 +9,11 @@ const skillMd = (version: string, body = "Do the thing.") =>
 
 describe("skillHash", () => {
   let dir: string;
+  let tmp: string;
 
   beforeEach(() => {
-    dir = join(mkdtempSync(join(tmpdir(), "skill-")), "sample");
+    tmp = mkdtempSync(join(tmpdir(), "skill-"));
+    dir = join(tmp, "sample");
     mkdirSync(join(dir, "evals"), { recursive: true });
     mkdirSync(join(dir, "tests"), { recursive: true });
     writeFileSync(join(dir, "SKILL.md"), skillMd("0.1.0"));
@@ -19,6 +21,8 @@ describe("skillHash", () => {
     writeFileSync(join(dir, "tests", "sample.test.ts"), "// test\n");
     writeFileSync(join(dir, "CHANGELOG.md"), "# Changelog\n");
   });
+
+  afterEach(() => rmSync(tmp, { recursive: true, force: true }));
 
   it("is unchanged after editing evals/, tests/ and CHANGELOG.md", () => {
     const before = skillHash(dir);

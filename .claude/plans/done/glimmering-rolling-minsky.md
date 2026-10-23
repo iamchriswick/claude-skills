@@ -1,5 +1,7 @@
 # Plan: Release setup for claude-skills (from docs/superpowers/specs/2026-10-23-release-setup-design.md, 2026-10-23)
 
+note: retired on 2026-10-23. T1.9 was done by the user; T2.0's result was not accepted. The work continues from T1.10 in you-are-taking-over-stateful-matsumoto.md.
+
 ## How to use this plan (read first, every session)
 
 The plan is the whole goal. Its tasks are grouped by branch and numbered by group: `T<group>.<n>`, for example T1.3 is the third task of branch group 1. Read this header and Context once per session; then read the active branch group's context and the active task. Don't read other tasks or whole areas of the codebase. Within a branch group, continue to the next task in the same session; after a group is merged, the handover suggests `/clear`. The repository has no `CLAUDE.md` until T1.7 writes it. Until then, the conventions under Context → Constraints apply. After T1.7, `CLAUDE.md` applies at all times, and this header adds the plan rules.
@@ -715,7 +717,7 @@ docs(repo): complete branch group 1 checks of release setup plan
 - **Manual check:** run `gh pr checks --watch`. Pass: `commitlint`, `test` and `benchmarks` all show `pass`. If one fails, stop and report its log (`gh run view --log-failed`).
 - **Report:** the PR URL, the three check results, and that T1.9's user steps come next.
 
-#### [ ] T1.9: User step: protect `main`, add the release token and merge the pull request
+#### [x] T1.9: User step: protect `main`, add the release token and merge the pull request
 
 - **Start branch:** `chore/release-setup`.
 - **Instructions:** spec § Steps only the user can do, adjusted under Context → Decided. The user:

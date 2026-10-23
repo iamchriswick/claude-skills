@@ -7,7 +7,9 @@ Claude Code skills, each in `skills/<skill-name>/`, released on its own.
 - **Base branch:** `main`, the only long-lived branch.
 - **Branch names:** `<type>/<skill-name>-<desc>` for one skill, `<type>/<desc>` for repository work. `<type>` is `feat`, `bugfix`, `hotfix` or `chore`.
 - **Commits:** Conventional Commits, `type(scope): summary`. The scope is a skill folder name or one of `repo`, `ci`, `deps`, `release` and `main`. The `commit-msg` hook checks every message.
-- **Getting to `main`:** only through a pull request. Push the branch, open the PR with `gh pr create --base main`, then stop. The user merges it on GitHub with "Create a merge commit". Never push to, merge into or force-push `main`.
+- **Skill branches** (`<type>/<skill-name>-<desc>`, and any branch that changes `skills/`) reach `main` only through a pull request. Push the branch, open the PR with `gh pr create --base main`, then stop. The user merges it on GitHub with "Create a merge commit".
+- **Repository branches** (`<type>/<desc>`): once `pnpm test` passes, merge with `git switch main && git merge --no-ff --no-edit <branch>` and push with `git push origin main`.
+- **Never force-push `main`.**
 - **Hooks:** never bypass them (`--no-verify`).
 
 ## Commands
