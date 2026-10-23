@@ -554,7 +554,7 @@ plan from a spec, a vague request, a plan file outside the repository
 and the don't-ask pressure case.
 ```
 
-#### [ ] T2.6: Run the evaluation and record its benchmark
+#### [x] T2.6: Run the evaluation and record its benchmark
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/evals/benchmark.json` (new), `skills/create-plan/evals/benchmark.meta.json` (new). The run itself is in the ignored `skills/create-plan-workspace/`.
