@@ -14,7 +14,7 @@
         "The plan has exactly three `## ` sections: `How to use this plan (read first, every session)`, `Context` and `Tasks`",
         "Date-range search and markdown export are in two separate branch groups, each on its own `feat/<desc>` branch",
         "Every work task has a Start branch, a Verify or Manual check with explicit pass criteria, and a Commit message",
-        "Each branch group ends with a task that pushes the branch and opens a pull request with `gh pr create --base main`, and doesn't merge it"
+        "Each branch group has a task that pushes the branch and opens a pull request with `gh pr create --base main`, and no task the agent carries out merges a pull request"
       ]
     },
     {
@@ -60,11 +60,11 @@
       "id": 5,
       "eval_name": "plan-file-outside-repository",
       "prompt": "Plan the markdown export for notes-cli (`notes export notes.md`), and save the plan to ../plans/notes-export.md.",
-      "expected_output": "No plan is written outside the repository. The response tells the user to set plansDirectory to ./.claude/plans/active and start again.",
+      "expected_output": "No plan is written outside the repository. The plan goes to .claude/plans/active/, where the project's plansDirectory puts it, and the response explains why it isn't at ../plans/.",
       "files": ["evals/files/notes-cli"],
       "assertions": [
         "No file exists at outputs/plans/notes-export.md, or anywhere else outside repo/",
-        "The final response tells the user to set `\"plansDirectory\": \"./.claude/plans/active\"`"
+        "The final response says the plan was saved under `.claude/plans/active/` in the repository instead of `../plans/`, and explains why"
       ]
     },
     {
