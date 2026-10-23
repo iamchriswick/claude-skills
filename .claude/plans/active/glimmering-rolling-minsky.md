@@ -470,7 +470,11 @@ pnpm eval:record, and fails a push or PR that changes a skill
 without a fresh, passing benchmark.
 ```
 
-#### [ ] T1.5: Release each skill on its own with release-please and a subtree split
+#### [x] T1.5: Release each skill on its own with release-please and a subtree split
+
+note: release-please 17.11.2's generic updater turns the sample into `version: "0.2.0" # x-release-please-version`, so group 2 keeps the version in `SKILL.md`'s frontmatter.
+
+note: under pnpm 11.7.0, `pnpm dlx -p release-please node …` runs the `release-please` command, not `node`, and fails. The check ran the same script with `node` against `release-please` installed with `npm install` in a scratch folder outside the repo.
 
 - **Start branch:** `chore/release-setup`.
 - **Files:**
