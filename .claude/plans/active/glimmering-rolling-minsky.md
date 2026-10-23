@@ -577,7 +577,7 @@ and release PR; after a release the skill folder is split into
 split/<skill> with a split/<skill>/vX.Y.Z tag.
 ```
 
-#### [ ] T1.6: Run commitlint, tests and the benchmark check on every pull request
+#### [x] T1.6: Run commitlint, tests and the benchmark check on every pull request
 
 - **Start branch:** `chore/release-setup`.
 - **Files:** `.github/workflows/ci.yml` (new).
