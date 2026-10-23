@@ -223,7 +223,9 @@ The first plan's T2.0 was not accepted. The new plan continues from
 T1.10 with the user's answers; the old plan moves to done/.
 ```
 
-#### [ ] T1.11: Delete the tests' temporary folders after each test
+#### [x] T1.11: Delete the tests' temporary folders after each test
+
+note: the Verify grep `^[-+].*expect` also matches the changed vitest import lines; no assertion line changed.
 
 - **Start branch:** `chore/release-setup`.
 - **Files:** `tests/skill-hash.test.ts:1-21`, `tests/check-benchmarks.test.ts:1-27`, `tests/eval-record.test.ts:1-32`.

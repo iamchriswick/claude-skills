@@ -1,7 +1,7 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { recordEvaluation } from "../scripts/eval-record.mjs";
 import { skillHash } from "../scripts/skill-hash.mjs";
 
@@ -29,6 +29,8 @@ describe("recordEvaluation", () => {
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(skillDir, "SKILL.md"), "---\nname: create-plan\n---\n\nWrite the plan.\n");
   });
+
+  afterEach(() => rmSync(root, { recursive: true, force: true }));
 
   it("writes the benchmark and its meta", () => {
     const iterationDir = writeIteration("iteration-3", benchmark(1.0, 0.5));

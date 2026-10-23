@@ -1,7 +1,7 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { checkSkill } from "../scripts/check-benchmarks.mjs";
 import { skillHash } from "../scripts/skill-hash.mjs";
 
@@ -14,6 +14,7 @@ const benchmark = (withSkill: number, withoutSkill: number) => ({
 
 describe("checkSkill", () => {
   let dir: string;
+  let tmp: string;
 
   const writeJson = (name: string, data: unknown) =>
     writeFileSync(join(dir, "evals", name), JSON.stringify(data, null, 2) + "\n");
@@ -21,10 +22,13 @@ describe("checkSkill", () => {
     writeJson("benchmark.meta.json", { skill_sha256: sha, evaluated_at: "2026-10-23", iteration: 1, threshold: 0.9 });
 
   beforeEach(() => {
-    dir = join(mkdtempSync(join(tmpdir(), "skill-")), "sample");
+    tmp = mkdtempSync(join(tmpdir(), "skill-"));
+    dir = join(tmp, "sample");
     mkdirSync(join(dir, "evals"), { recursive: true });
     writeFileSync(join(dir, "SKILL.md"), "---\nname: sample\n---\n\nDo the thing.\n");
   });
+
+  afterEach(() => rmSync(tmp, { recursive: true, force: true }));
 
   it("passes a skill with a matching meta and pass rates 1.0 vs 0.5", () => {
     writeJson("benchmark.json", benchmark(1.0, 0.5));
