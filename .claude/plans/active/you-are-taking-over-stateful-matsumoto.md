@@ -310,7 +310,9 @@ the split could not find it. The split steps now live in splitSkill
 and fetch the tag first.
 ```
 
-#### [ ] T1.14: Record the confirmed branch flow in CLAUDE.md and the spec
+#### [x] T1.14: Record the confirmed branch flow in CLAUDE.md and the spec
+
+note: the "Getting to `main`" bullet was on `CLAUDE.md:10`, not `:9`; its text matched, so line 10 was replaced.
 
 - **Start branch:** `chore/release-setup`.
 - **Files:** `CLAUDE.md:9`, `docs/superpowers/specs/2026-10-23-release-setup-design.md:18, :48, :154, :178, :180`.
