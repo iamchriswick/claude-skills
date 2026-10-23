@@ -11,6 +11,17 @@ export function releasedSkills(outputs) {
   }));
 }
 
+export function splitSkill(skill, git) {
+  git("fetch", "origin", `refs/tags/${skill.tag}:refs/tags/${skill.tag}`);
+  const sha = git("subtree", "split", `--prefix=${skill.path}`, skill.tag);
+  const branch = `refs/heads/split/${skill.name}`;
+  git("push", "--force-with-lease", "origin", `${sha}:${branch}`);
+  const splitTag = `split/${skill.name}/v${skill.version}`;
+  git("tag", splitTag, sha);
+  git("push", "origin", `refs/tags/${splitTag}`);
+  return [branch, `refs/tags/${splitTag}`];
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
   const outputs = JSON.parse(process.env.RP_OUTPUTS);
@@ -21,12 +32,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     process.exit(1);
   }
   for (const skill of releasedSkills(outputs)) {
-    const sha = git("subtree", "split", `--prefix=${skill.path}`, skill.tag);
-    git("push", "--force-with-lease", "origin", `${sha}:refs/heads/split/${skill.name}`);
-    console.log(`pushed refs/heads/split/${skill.name}`);
-    const splitTag = `split/${skill.name}/v${skill.version}`;
-    git("tag", splitTag, sha);
-    git("push", "origin", `refs/tags/${splitTag}`);
-    console.log(`pushed refs/tags/${splitTag}`);
+    for (const ref of splitSkill(skill, git)) console.log(`pushed ${ref}`);
   }
 }

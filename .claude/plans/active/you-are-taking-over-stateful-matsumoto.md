@@ -248,7 +248,7 @@ The hash, benchmark and record tests left a /tmp/skill-* folder per
 test; each now removes its folder in afterEach.
 ```
 
-#### [ ] T1.12: Clean the workspace of T2.0's and older leftovers
+#### [x] T1.12: Clean the workspace of T2.0's and older leftovers
 
 - **Start branch:** `chore/release-setup`. No commit of its own: nothing tracked changes, and the tick goes into T1.13's commit.
 - **Change:** check each target before you remove it; if a check fails, stop and tell the user.
@@ -266,7 +266,7 @@ test; each now removes its folder in afterEach.
   - `git branch --format='%(refname:short)'` lists `chore/release-setup`, `feat/create-plan-skill` and `main`;
   - `git status --short` shows only the plan file.
 
-#### [ ] T1.13: Fetch the release tag before splitting a released skill
+#### [x] T1.13: Fetch the release tag before splitting a released skill
 
 - **Start branch:** `chore/release-setup`.
 - **Files:** `scripts/split-released.mjs:14-31`, `tests/split-released.test.ts`.
