@@ -468,7 +468,7 @@ The template must keep the title pattern, exactly three top-level
 sections, and the required fields of each task kind.
 ```
 
-#### [ ] T2.2: Add the version metadata and the release-please entry
+#### [x] T2.2: Add the version metadata and the release-please entry
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/SKILL.md:1-6`, `release-please-config.json`.
