@@ -394,7 +394,7 @@ docs(repo): complete branch group 1 checks of release setup plan
 - The behavior tests in `skills/create-plan/evals/evals.json` run with skill-creator (T2.6), and `pnpm run check:benchmarks` checks the record.
 - The release can only be checked on GitHub: a dry run in T2.7, the real release in T2.8.
 
-#### [ ] T2.1: Check the plan template's title, sections and task fields
+#### [x] T2.1: Check the plan template's title, sections and task fields
 
 - **Start branch:** `main`, with group 1 merged. Run `git switch feat/create-plan-skill && git rebase main`, then `pnpm install`. If the rebase reports a conflict, abort it, stop and tell the user. `git log --oneline main..HEAD` shows the three `feat(create-plan)` commits.
 - **Files:** `skills/create-plan/tests/plan-template.test.ts` (new).
