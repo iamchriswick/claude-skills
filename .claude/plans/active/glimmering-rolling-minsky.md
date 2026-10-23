@@ -650,7 +650,7 @@ Every pull request into main runs commitlint over its commits, the
 vitest checks, and the benchmark check for changed skills.
 ```
 
-#### [ ] T1.7: Record the repository's conventions in CLAUDE.md
+#### [x] T1.7: Record the repository's conventions in CLAUDE.md
 
 - **Start branch:** `chore/release-setup`.
 - **Files:** `CLAUDE.md` (new).
