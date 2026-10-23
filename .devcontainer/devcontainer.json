@@ -1,0 +1,63 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+  // The name VS Code shows for this container
+  "name": "claude-skills",
+
+  // The base image: Node.js 24 (LTS) on Debian 13 "trixie", maintained by the devcontainers project.
+  // "5-" follows the latest 5.x release of the image itself.
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:5-24-trixie",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // Each feature installs one tool into the image; ":1" follows the latest 1.x version.
+  "features": {
+    // Python, used by skill-creator's test scripts (results viewer, benchmark summary)
+    "ghcr.io/devcontainers/features/python:1": {},
+    // GitHub CLI ("gh"), for pull requests and repo work from the terminal
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    // Claude Code, Anthropic's official feature (not in VS Code's feature list, added by hand)
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+
+  // Extra storage attached to the container. A Docker volume survives container rebuilds,
+  // so the Claude Code login and settings kept here aren't lost.
+  // ${devcontainerId} gives this repo its own volume, separate from other projects' containers.
+  "mounts": [
+    {
+      "source": "claude-code-config-${devcontainerId}",
+      "target": "/home/node/.claude",
+      "type": "volume"
+    }
+  ],
+
+  // Environment variables set inside the container.
+  // CLAUDE_CONFIG_DIR makes Claude Code keep all its files in the volume above;
+  // without it, part of its setup is written to the home folder and lost on rebuild.
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude"
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // Not needed here: this repo runs no servers.
+  // "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // A new volume is owned by root; this hands it to the "node" user so Claude Code can write to it.
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude",
+
+  // Configure tool-specific properties.
+  "customizations": {
+    // Settings for VS Code when it connects to this container
+    "vscode": {
+      // Extensions installed inside the container, so they're there on every computer.
+      // The Claude Code feature also installs this one; it's listed here so it's visible.
+      "extensions": ["anthropic.claude-code"]
+    }
+  },
+
+  // The user you work as inside the container. "node" is the image's normal, non-root user,
+  // and the paths above (/home/node/...) assume it.
+  // Change to "root" to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  "remoteUser": "node"
+}
