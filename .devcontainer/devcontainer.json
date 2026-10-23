@@ -43,8 +43,8 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // A new volume is owned by root; this hands it to the "node" user so Claude Code can write to it.
-  "postCreateCommand": "sudo chown -R node:node /home/node/.claude",
+  // A new volume is owned by root; this hands it to the "node" user so Claude Code can write to it, then installs the repo's dev dependencies, which also turns on its git hooks.
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude && pnpm install",
 
   // Configure tool-specific properties.
   "customizations": {
