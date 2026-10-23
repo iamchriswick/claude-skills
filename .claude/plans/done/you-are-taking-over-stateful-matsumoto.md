@@ -606,7 +606,9 @@ docs(repo): complete branch group 2 checks of release setup plan
   3. Run `gh pr checks --watch`. Pass: `commitlint`, `test` and `benchmarks` all show `pass`. If one fails, stop and report its log (`gh run view --log-failed`).
 - **Report:** the PR URL, the dry-run result, the three check results, and that T2.8's user step comes next.
 
-#### [ ] T2.8: User step: merge the pull request and the release pull request
+#### [x] T2.8: User step: merge the pull request and the release pull request
+
+- note: done (2026-10-23): PR #3 and release PR #4 merged; the release run for #4 succeeded; `origin` has `create-plan-v0.1.0`, `split/create-plan` and `split/create-plan/v0.1.0`.
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Instructions:**
@@ -629,7 +631,10 @@ docs(repo): complete branch group 2 checks of release setup plan
 
 **Tests:** `pnpm test` before the merge. The release itself is checked with `git` and `gh` against `origin`.
 
-#### [ ] T3.1: Check the release, move the plan to `done/`, merge and push
+#### [x] T3.1: Check the release, move the plan to `done/`, merge and push
+
+- note: checks passed (2026-10-23): `gh release view create-plan-v0.1.0` succeeds; `origin/split/create-plan` holds `CHANGELOG.md`, `SKILL.md`, `evals`, `plan-template.md` and `tests` with no `skills/` folder; `split/create-plan/v0.1.0` and `origin/split/create-plan` are both `ecfd25d`; the tagged `SKILL.md` has `version: "0.1.0" # x-release-please-version`; the manifest is `{"skills/create-plan":"0.1.0"}`; `pnpm test` passed 30 of 30.
+- note: the direct push to `main` was refused (`enforce_admins` is on, so `main` needs a PR with the three checks). The user decided (2026-10-23) to reach `main` this one time through a PR from `chore/release-setup-plan-done`, merged by the user, instead of the direct merge and push.
 
 - **Start branch:** `main`, with the release merged. Run `git switch main && git pull --ff-only origin main`, then `git switch -c chore/release-setup-plan-done` and `pnpm install`. This plan file comes from `main` with T2.7's tick; T2.8 isn't ticked yet.
 - **No code changes.** Its only commits are the plan tick with the move, and the merge commit. If a check fails, stop and tell the user; don't fix it here.
