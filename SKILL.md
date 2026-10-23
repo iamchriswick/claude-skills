@@ -34,6 +34,8 @@ List these under Context → Decided as planning decisions. The user reviews the
 
 **How to ask.** Ask everything in one round, with the most consequential questions first. Give a recommended option and the alternatives for each question. AskUserQuestion takes up to 4 questions per call, so use several calls in a row if you need more. Ask a second round only about what the answers themselves opened up.
 
+**If the user tells you not to ask** ("just write the plan"), ask only what blocks the plan entirely: a contradiction between the sources, or a scope too vague to plan at all. Record every other open choice under Decided as a planning decision, for the user to review when approving.
+
 What the user answers becomes a decision in the plan. What the user leaves open stays open in the plan. Questions are never written into the plan.
 
 | Thought | Reality |
