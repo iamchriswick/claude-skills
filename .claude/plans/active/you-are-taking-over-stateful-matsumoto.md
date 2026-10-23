@@ -503,7 +503,7 @@ updater, and the skill is a release-please package whose first
 release is 0.1.0.
 ```
 
-#### [ ] T2.3: User step: install skill-creator in project scope
+#### [x] T2.3: User step: install skill-creator in project scope
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Instructions:** in `/workspaces/claude-skills`, run `claude plugin marketplace add anthropics/claude-plugins-official --scope project` and `claude plugin install skill-creator@claude-plugins-official --scope project`, then restart Claude Code in `/workspaces/claude-skills`.
@@ -513,7 +513,9 @@ release is 0.1.0.
 
   If either command fails, stop and report its output.
 
-#### [ ] T2.4: Commit the project-scope skill-creator settings
+- note: the agent ran both commands at the user's request (yolo mode, 2026-10-23); both Done when checks passed. The CLI moved `plansDirectory` to the end of `.claude/settings.json`; the agent moved it back so the diff only adds lines. The restart is still the user's, before T2.5 loads `skill-creator:skill-creator`.
+
+#### [x] T2.4: Commit the project-scope skill-creator settings
 
 - **Start branch:** `feat/create-plan-skill`, with the uncommitted `.claude/settings.json` change from T2.3.
 - **Files:** `.claude/settings.json`.

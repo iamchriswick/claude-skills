@@ -1,6 +1,15 @@
 {
   "plansDirectory": "./.claude/plans/active",
   "enabledPlugins": {
-    "superpowers@anthropic-plugin-directory": true
+    "superpowers@anthropic-plugin-directory": true,
+    "skill-creator@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   }
 }
