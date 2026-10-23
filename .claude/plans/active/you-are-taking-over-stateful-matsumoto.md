@@ -346,13 +346,18 @@ are merged locally and pushed once pnpm test passes, with the owner
 allowed to bypass main's protection.
 ```
 
-#### [ ] T1.15: User step: let the owner bypass `main`'s protection
+#### [x] T1.15: User step: let the owner bypass `main`'s protection
+
+note: not done. One-time exception (user, 2026-10-23): group 1 reaches `main` through a pull request instead of a direct push, so `main`'s protection is unchanged (`enforce_admins` stays `true`). Later repository groups still need this step before a direct push.
 
 - **Start branch:** `chore/release-setup`.
 - **Instructions:** on GitHub → `iamchriswick/claude-skills` → Settings → Branches → the rule for `main` → Edit, clear "Do not allow bypassing the above settings" and save. Keep every other setting.
 - **Done when:** `gh api repos/iamchriswick/claude-skills/branches/main/protection --jq '[.enforce_admins.enabled, (.required_status_checks.contexts | sort), (.required_pull_request_reviews != null), .allow_force_pushes.enabled]'` shows, in order: `false`; `benchmarks`, `commitlint`, `test`; `true`; `false`.
 
-#### [ ] T1.16: Check group 1, merge it into `main` and push
+#### [x] T1.16: Check group 1, merge it into `main` and push
+
+note: checks passed: `main` and `origin/main` at `8bb24be`; clean install exits 0; `Tests  17 passed (17)`; `no skill changes`; commitlint exits 0.
+note: one-time exception (user, 2026-10-23): in place of the local merge and push, the branch is pushed and a PR into `main` is opened; the user merges it on GitHub. After the merge, delete `chore/release-setup` on `origin` and locally, and fast-forward local `main`.
 
 - **Start branch:** `chore/release-setup`.
 - **No code changes.** Its only commits are the plan tick and the merge commit. If a check fails, stop and tell the user; don't fix it here.
