@@ -584,6 +584,8 @@ Records skill-creator iteration <N>: with-skill pass rate <w> against
 
   Replace `<N>`, `<w>` and `<wo>` with the recorded values.
 
+- note: iteration 1 scored with-skill 0.888 against 0.333 without; both with-skill failures were assertion wording (several-features: a group that ends with the user's merge step; plan-file-outside-repository: the fixture already sets `plansDirectory`). The user decided (2026-10-23) to reword those two assertions in `evals.json`, in their own commit `test(create-plan): fix two evaluation assertions`, and rerun every case as iteration 2. T2.7's Manual check also expects that commit.
+
 #### [ ] T2.7: Check group 2, push the branch and open its pull request
 
 - **Start branch:** `feat/create-plan-skill`.
