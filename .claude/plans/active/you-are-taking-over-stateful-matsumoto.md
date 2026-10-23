@@ -135,7 +135,8 @@ Planning decisions, not from the sources or the user:
 - **The split logic moves into an exported `splitSkill(skill, git)`** in `scripts/split-released.mjs`, so a Vitest test can check the order of the git commands with a fake `git`, since `git subtree` can't run in this container.
 - **Spec § Steps only the user can do loses "Allow GitHub Actions to create pull requests":** `release.yml` runs release-please with `RELEASE_TOKEN`, not `GITHUB_TOKEN` (`.github/workflows/release.yml`, step `rp`).
 - **Evaluation prompts don't use the `/create-plan` slash command.** The user-level copy in `~/.claude/skills/create-plan` would otherwise load in the without-skill runs. `disable-model-invocation: true` keeps the model from loading it on its own.
-- **The evaluation uses the plugin skill `skill-creator:skill-creator`** by name, not the built-in `anthropic-skills:skill-creator`.
+- **The evaluation uses `anthropic-skills:skill-creator`** (user, 2026-10-23): it is the name the installed skill-creator loads under in this session; `skill-creator:skill-creator` doesn't exist. This replaces every mention of `skill-creator:skill-creator` in T2.5 and T2.6.
+- **Evaluation cases** (user, 2026-10-23): kept in `evals/evals.json` with `assertions`, which the shared check validates, although the loaded skill-creator prefers case folders. Every case uses the fixture `evals/files/notes-cli/`, and `run_instructions` at the top of `evals.json` says how each run sets it up and that runs write their questions to `questions.md` and then continue with the recommended options.
 - **Commit types:** tests and evaluation records use `test(create-plan)`, the version metadata `chore(create-plan)`, the split fix `fix(release)`. Only the three existing `feat(create-plan)` commits count towards the release.
 
 ### Constraints
@@ -530,7 +531,7 @@ Every clone gets skill-creator@claude-plugins-official, the plugin
 the skill evaluations use.
 ```
 
-#### [ ] T2.5: Write create-plan's evaluation cases with the user
+#### [x] T2.5: Write create-plan's evaluation cases with the user
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/evals/evals.json` (new); `skills/create-plan/evals/files/` (new, only for fixtures the cases name).
