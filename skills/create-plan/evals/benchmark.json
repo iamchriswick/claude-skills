@@ -1,0 +1,536 @@
+{
+  "metadata": {
+    "skill_name": "create-plan",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-10-23T17:35:46Z",
+    "evals_run": [
+      "dont-ask-pressure",
+      "plan-file-outside-repository",
+      "plan-from-spec",
+      "several-features",
+      "single-bugfix",
+      "vague-request"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": "dont-ask-pressure",
+      "eval_name": "dont-ask-pressure",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 113.0,
+        "tokens": 59018,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md doesn't exist, or asks only about a contradiction or a scope too vague to plan",
+          "passed": true,
+          "evidence": "with_skill/outputs/ contains only response.md and repo/; no questions.md exists. response.md:3: 'You asked me not to ask, and nothing blocked the plan, so I didn't ask anything.'"
+        },
+        {
+          "text": "The plan lists the front matter fields and the --since decision under Context \u2192 Decided, marked as planning decisions rather than the user's",
+          "passed": true,
+          "evidence": "Plan line 79: '### Decided (planning decisions, 2026-10-23, for review)' under '## Context'; line 81: 'The user asked not to be asked, so these choices are the planner's, not the user's.' Front matter fields listed (line 95: 'Front matter holds `id` and `created`'), and the --since decision (line 83: '**`--since` is included.** The request lists it as optional (\"maybe\")...'; line 98 gives its format and inclusivity)."
+        },
+        {
+          "text": "The plan contains no questions and doesn't address the user",
+          "passed": true,
+          "evidence": "grep for '?' in the plan finds only JS ternaries in code blocks (lines 241, 242, 250); no questions. The user is referenced only in third person ('stop and tell the user', 'the user merges'); 'you' in the header (lines 10, 16, 42, 50, 56) addresses the executing agent, not the user."
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections",
+          "passed": true,
+          "evidence": "Line 1: '# Plan: Markdown export for notes-cli (from user request, 2026-10-23)'. `## ` headings are exactly three: line 3 '## How to use this plan (read first, every session)', line 58 '## Context', line 137 '## Tasks'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "plan-file-outside-repository",
+      "eval_name": "plan-file-outside-repository",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 142.9,
+        "tokens": 62043,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No file exists at outputs/plans/notes-export.md, or anywhere else outside repo/",
+          "passed": true,
+          "evidence": "outputs/ contains only questions.md, response.md and repo/ (no outputs/plans/). The plan is inside the repository: `git -C repo status --short` shows `?? .claude/plans/` and the file is repo/.claude/plans/active/notes-export.md."
+        },
+        {
+          "text": "The final response says the plan was saved under `.claude/plans/active/` in the repository instead of `../plans/`, and explains why",
+          "passed": true,
+          "evidence": "response.md: \"**I didn't save it to `../plans/notes-export.md`.** That path is outside the repository. Your project sets `\\\"plansDirectory\\\": \\\"./.claude/plans/active\\\"` in `.claude/settings.json`, and the plan has to sit in the repository so it gets committed with the work. ... So the plan is at: `.claude/plans/active/notes-export.md`\". The file exists at that path."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "plan-from-spec",
+      "eval_name": "plan-from-spec",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 153.5,
+        "tokens": 63266,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md asks about the maximum number of tags per note (the spec's TODO)",
+          "passed": true,
+          "evidence": "questions.md: '## 2. TODO in the spec: maximum number of tags per note' with '**Recommended:** 10 distinct tags per note', 'Alternative A: 5.', 'Alternative B: no limit (remove the TODO).'"
+        },
+        {
+          "text": "questions.md asks whether to include tag colours (the spec's optional item)",
+          "passed": true,
+          "evidence": "questions.md: '## 3. Optional item: tag colours in `notes list`' with '**Recommended:** leave it out of this plan (Not in scope).' and 'Alternative: include it, which also needs a rule for detecting colour support'."
+        },
+        {
+          "text": "questions.md points out that the spec stores tags in SQLite `notes.db` while the code stores notes in `notes.json`",
+          "passed": true,
+          "evidence": "questions.md: '## 1. Storage: the spec contradicts the code' - 'The spec (Storage) puts tags in a new `tags` table in the SQLite database `notes.db` ... There is no `notes.db` and no `notes` table: notes live in `notes.json`'."
+        },
+        {
+          "text": "The plan cites docs/spec-tags.md sections as sources",
+          "passed": true,
+          "evidence": "Plan tags-for-notes.md, Context \u2192 Source: '`docs/spec-tags.md`: Goal, Commands (`add --tag`, `list --tag`, `tags`) and Limits (tag format; the maximum-tags TODO, resolved below). Storage is replaced by a user decision (see Decided). Optional (tag colours) is not in scope.' Branch group 1: '**Covers:** `docs/spec-tags.md` \u2192 Goal, Commands, Limits'. Constraints: 'Tag format: `^[a-z0-9-]+$` (`docs/spec-tags.md` \u2192 Limits)'."
+        },
+        {
+          "text": "The answers appear under Context \u2192 Decided, attributed to the user with a date",
+          "passed": true,
+          "evidence": "Plan has '## Context' > '### Decided (user, 2026-10-23)' with 'The user accepted the recommended option for every question.' followed by Storage (notes.json), 'Maximum tags per note: 10 distinct tags', invalid tags, list output, tags output, origin remote user step. Tag colours answer appears under Not in scope instead."
+        },
+        {
+          "text": "Tag colours are either a planned task or listed under Not in scope",
+          "passed": true,
+          "evidence": "Plan '### Not in scope': '- Tag colours in `notes list` output (`docs/spec-tags.md` \u2192 Optional); consult the user before adding them.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "several-features",
+      "eval_name": "several-features",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 196.7,
+        "tokens": 68738,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md exists, and each question in it gives a recommended option and at least one alternative",
+          "passed": true,
+          "evidence": "questions.md has 12 numbered questions, each with '(R)' and 'Alt:', e.g. Q1 '(R) Both ends inclusive, compared on the note's UTC date ... Alt: compare in local time; `--to` exclusive.'; Q9 '(R) Not in scope ... Alt: support the date range in export too.'; Q12 '(R) Export branch starts from `main` after you merge ... Alt: both branches from today's `main`, conflict resolved at merge.'"
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`",
+          "passed": true,
+          "evidence": "Line 1 of repo/.claude/plans/active/notes-date-range-and-export.md: '# Plan: Date-range listing and Markdown export for notes-cli (from the user's request, 2026-10-23)'."
+        },
+        {
+          "text": "The plan has exactly three `## ` sections: `How to use this plan (read first, every session)`, `Context` and `Tasks`",
+          "passed": true,
+          "evidence": "grep '^## ' finds exactly three: line 3 '## How to use this plan (read first, every session)', line 62 '## Context', line 148 '## Tasks'."
+        },
+        {
+          "text": "Date-range search and markdown export are in two separate branch groups, each on its own `feat/<desc>` branch",
+          "passed": true,
+          "evidence": "'### Branch group 1: `feat/list-date-range`' (T1.1-T1.5, date-range listing) and '### Branch group 2: `feat/export-markdown`' (T2.1-T2.3, Markdown export). T1.1 'git switch -c feat/list-date-range'; T2.1 'git switch -c feat/export-markdown'."
+        },
+        {
+          "text": "Every work task has a Start branch, a Verify or Manual check with explicit pass criteria, and a Commit message",
+          "passed": true,
+          "evidence": "Each agent task (T1.1, T1.2, T1.4, T2.1, T2.2, T2.3) has '**Start branch:**', a Verify and/or Manual check with explicit criteria (e.g. T1.1 Verify 'git diff main -- src shows only the appended checkDay and filterByDate' plus 'npm test ... 7 tests pass, 0 fail'; T1.2 Manual check 'list --from 2026-02-30: stderr `invalid --from date \"2026-02-30\", expected YYYY-MM-DD`, nothing on stdout, `echo $?` prints 1'; T1.4/T2.3 Manual check 'every case passes as described there'), and a '**Commit message:**' block (e.g. 'feat(list): add filterByDate for an inclusive date range', 'docs(plan): complete branch group 1 ...'). T1.3 and T1.5 are User steps with Instructions and 'Done when', not work tasks."
+        },
+        {
+          "text": "Each branch group has a task that pushes the branch and opens a pull request with `gh pr create --base main`, and no task the agent carries out merges a pull request",
+          "passed": true,
+          "evidence": "T1.4: 'git push -u origin feat/list-date-range' and 'gh pr create --base main --head feat/list-date-range ...' then 'Then stop ... the user merges it in T1.5.' T2.3: 'git push -u origin feat/export-markdown' and 'gh pr create --base main --head feat/export-markdown ...' then 'the user merges it.' The only merge is T1.5 '**User step**: merge group 1's pull request'; header says 'A task marked User step is done by the user, never by you'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "single-bugfix",
+      "eval_name": "single-bugfix",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 118.3,
+        "tokens": 59367,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The plan has exactly one branch group, on a branch named `fix/<desc>`",
+          "passed": true,
+          "evidence": "Plan Context > Branch groups lists only '1. `fix/delete-by-id`: delete by id, ...'; Tasks has only '### Branch group 1: `fix/delete-by-id`' with T1.1-T1.3; header: 'Use only the branch `fix/delete-by-id`.'"
+        },
+        {
+          "text": "The plan cites the bug as `src/notes.js:<line or lines>`, covering line 18 (`copy.splice(id, 1)`)",
+          "passed": true,
+          "evidence": "Cause: '`remove` (`src/notes.js:16-20`) passes the id to `Array.prototype.splice` as an array index'; Context quotes `src/notes.js:16-20` including `copy.splice(id, 1);`, which is line 18 of repo/src/notes.js."
+        },
+        {
+          "text": "A task adds a test for deleting by id that fails before the fix, and a check runs `npm test` with an explicit pass criterion",
+          "passed": true,
+          "evidence": "T1.1 Tests: 'test(\"remove deletes the note with the given id\", ...)': four notes, `assert.deepEqual(remove(notes, 3).map((note) => note.text), [\"one\", \"two\", \"four\"]);`. Against the current remove (splice index 3) this yields [one,two,three], so it fails before the fix (the plan does not run it red first; fix and test are in the same task). Checks: 'Run `npm test` and read the summary: 6 tests, 0 failures.' and T1.3 'run `npm test` and read the summary: pass if 10 tests, 0 failures.'"
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections",
+          "passed": true,
+          "evidence": "Line 1: '# Plan: Make `notes delete` remove the note with the given id (from user request, 2026-10-23)'. `## ` headings (grep '^## '): 'How to use this plan (read first, every session)' (line 3), 'Context' (58), 'Tasks' (138); exactly three."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "vague-request",
+      "eval_name": "vague-request",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 208.8,
+        "tokens": 70569,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md asks the user to define the goal or scope of 'better' before any plan is written",
+          "passed": true,
+          "evidence": "questions.md opens its question list with '1. **Scope: what should \"less clunky\" cover?**' and offers a recommended scope ('fix `delete` to work by id; ... clearer CLI feedback ...') plus alternatives ('only the delete bug; the above plus new commands (edit, search); the above plus the tags spec'). response.md: '\"Clunky\" could mean a lot of things, so before writing anything I tried the CLI and asked you about scope'. The order can't be confirmed without a transcript."
+        },
+        {
+          "text": "No plan contains improvements that the questions didn't offer and the recommended answers didn't choose",
+          "passed": true,
+          "evidence": "Every improvement in the plan traces to a recommended answer. Q1 recommended: delete by id; confirmations for add/delete; errors for empty text, bad or unknown ids and unknown commands; 'no notes yet'; a help command that exits 0; a readable error for a corrupt notes.json. Q3 recommended: the exact messages, `notes help`, `--help` and `-h` on stdout with exit 0, and no command printing usage on stderr with exit 1. Q4 and Q5 cover the unknown-id and corrupt-file messages. Q7 covers the remote user step. Plan groups T1.1 and T2.1 to T2.5 implement exactly these. 'Not in scope' lists 'New commands (edit, search), an argument-parser library, colour output and a lint setup'. 'help works with a corrupt notes.json' (T2.5) is an implementation detail of the chosen help and corrupt-file items, not a new improvement."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "dont-ask-pressure",
+      "eval_name": "dont-ask-pressure",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 46.5,
+        "tokens": 41870,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md doesn't exist, or asks only about a contradiction or a scope too vague to plan",
+          "passed": false,
+          "evidence": "without_skill/outputs/questions.md exists with six questions, e.g. '2. **What date format does `--since` take, and is it inclusive?**', '4. **What happens if the output file already exists?**', '6. **Should tags go in the front matter?**'. These are ordinary design choices, not contradictions or a scope too vague to plan (only Q1 on the 'maybe' --since is arguably scope)."
+        },
+        {
+          "text": "The plan lists the front matter fields and the --since decision under Context \u2192 Decided, marked as planning decisions rather than the user's",
+          "passed": false,
+          "evidence": "The plan has no Context section and no 'Decided' subsection. The decisions sit under line 7 '## Decisions (recommended defaults, not confirmed by the user)', which does mark them as not the user's and lists the front matter (`id`, `created`) and --since, but not under Context \u2192 Decided as required."
+        },
+        {
+          "text": "The plan contains no questions and doesn't address the user",
+          "passed": true,
+          "evidence": "grep for '?' finds only a JS ternary at line 43; no questions. No second-person 'you'/'your' in the plan; the user is referenced in third person (line 9: 'The user asked not to be asked anything')."
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections",
+          "passed": false,
+          "evidence": "Line 1 is '# Plan: Markdown export for notes-cli', missing '(from <source>, <YYYY-MM-DD>)'. It has six `## ` sections: Goal, Decisions, Changes, Verification, Git, Out of scope / noticed."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "plan-file-outside-repository",
+      "eval_name": "plan-file-outside-repository",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 2,
+        "total": 2,
+        "time_seconds": 54.0,
+        "tokens": 42880,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No file exists at outputs/plans/notes-export.md, or anywhere else outside repo/",
+          "passed": false,
+          "evidence": "The plan was written outside the repository at outputs/plans/notes-export.md (starts \"# Plan: Markdown export for notes-cli\"). repo/ has no .claude/plans/ and `git status --short` is clean."
+        },
+        {
+          "text": "The final response says the plan was saved under `.claude/plans/active/` in the repository instead of `../plans/`, and explains why",
+          "passed": false,
+          "evidence": "response.md says the opposite: \"I've saved the plan for `notes export notes.md` to `../plans/notes-export.md`, as you asked. ... The project's `plansDirectory` setting would put it in `.claude/plans/active/` instead. Tell me if you want it moved there.\" questions.md even recommended (a) `../plans/notes-export.md`."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "plan-from-spec",
+      "eval_name": "plan-from-spec",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 63.8,
+        "tokens": 43779,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md asks about the maximum number of tags per note (the spec's TODO)",
+          "passed": true,
+          "evidence": "questions.md item 2: '**Maximum tags per note (the spec's TODO).** - **Recommended:** 10 per note. ... - Alternatives: a different number, or no limit.'"
+        },
+        {
+          "text": "questions.md asks whether to include tag colours (the spec's optional item)",
+          "passed": true,
+          "evidence": "questions.md item 4: '**Optional tag colours in `notes list`.** - **Recommended:** leave them out of this change and track them as a follow-up. ... - Alternative: include them as the last step.'"
+        },
+        {
+          "text": "questions.md points out that the spec stores tags in SQLite `notes.db` while the code stores notes in `notes.json`",
+          "passed": true,
+          "evidence": "questions.md item 1: 'The spec says tags go in a new `tags` table in the SQLite database `notes.db` ... But notes-cli has no SQLite database. It stores notes as a JSON array in `notes.json`'."
+        },
+        {
+          "text": "The plan cites docs/spec-tags.md sections as sources",
+          "passed": false,
+          "evidence": "Plan tags-feature.md cites only the file: 'Source: `docs/spec-tags.md`'. No spec section (Goal, Commands, Storage, Limits, Optional) is cited as the source of a requirement; references like '(the spec's TODO)' and '(optional in the spec)' are informal. 'The Storage section' appears only in Step 5 as something to edit, not as a source citation."
+        },
+        {
+          "text": "The answers appear under Context \u2192 Decided, attributed to the user with a date",
+          "passed": false,
+          "evidence": "The plan has no Context section or Decided subsection. Answers are in a '## Decisions' table introduced by 'These are the recommended options from `questions.md`, all accepted.' - no attribution to the user and no date anywhere in the plan."
+        },
+        {
+          "text": "Tag colours are either a planned task or listed under Not in scope",
+          "passed": true,
+          "evidence": "Plan '## Out of scope': '- Tag colours in `notes list` (optional in the spec). This is a follow-up.' (heading is 'Out of scope', equivalent to Not in scope)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "several-features",
+      "eval_name": "several-features",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 82.0,
+        "tokens": 46336,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md exists, and each question in it gives a recommended option and at least one alternative",
+          "passed": true,
+          "evidence": "questions.md has 7 questions, each with a '**Recommended:**' bullet and one alternative bullet, e.g. Q1 'Recommended: two branches and two PRs ...' / 'One branch and one PR for both.'; Q5 'Recommended: refuse with an error unless `--force` is given' / 'Always overwrite.'; Q7 'Recommended: not now.' / 'Yes, in this work.'"
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`",
+          "passed": false,
+          "evidence": "Line 1 is '# Plan: filter `notes list` by date range, and `notes export` to Markdown' with no '(from <source>, <YYYY-MM-DD>)' suffix; the date appears only on line 3 'Status: not started \u00b7 Written 2026-10-23'."
+        },
+        {
+          "text": "The plan has exactly three `## ` sections: `How to use this plan (read first, every session)`, `Context` and `Tasks`",
+          "passed": false,
+          "evidence": "The plan has seven '## ' sections: Goal, Decisions (agreed), Current code (...), Part A: ..., Part B: ..., Out of scope (...), Checklist. None is 'How to use this plan (read first, every session)', 'Context' or 'Tasks'."
+        },
+        {
+          "text": "Date-range search and markdown export are in two separate branch groups, each on its own `feat/<desc>` branch",
+          "passed": true,
+          "evidence": "'## Part A: `notes list --from/--to` (branch `feat/list-date-range`)' with 'Start: ... git switch -c feat/list-date-range', and '## Part B: `notes export <file>` (branch `feat/export-markdown`)' with 'git switch -c feat/export-markdown'."
+        },
+        {
+          "text": "Every work task has a Start branch, a Verify or Manual check with explicit pass criteria, and a Commit message",
+          "passed": false,
+          "evidence": "No task has its own Start branch; the branch is given once per Part ('Start: git switch main && git pull && git switch -c feat/list-date-range'), so A2, A3, B1, B2 do not state where they start. Pass criteria are missing or implicit in several tasks: A2 has no Verify/Done-when line, B1 and B2 have no 'Done when' (only test descriptions and the Commit line), and A3's 'a manual run in a temp dir behaves as above' only refers back to the tests. Each work task does have a 'Commit:' line."
+        },
+        {
+          "text": "Each branch group has a task that pushes the branch and opens a pull request with `gh pr create --base main`, and no task the agent carries out merges a pull request",
+          "passed": true,
+          "evidence": "A4: 'git push -u origin feat/list-date-range and gh pr create --base main --title ... **Stop** here; the user merges.' B3: 'git push -u origin feat/export-markdown, gh pr create --base main ... **Stop**; the user merges.' No task merges a PR; B's start says 'Start after Part A is merged'. (Note: the repo has no remote, which the plan never addresses, so the pushes would fail as written.)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "single-bugfix",
+      "eval_name": "single-bugfix",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 33.0,
+        "tokens": 40339,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The plan has exactly one branch group, on a branch named `fix/<desc>`",
+          "passed": true,
+          "evidence": "The plan uses a single branch: Steps 1 'Branch from `main`: `fix/delete-by-id`.' and step 7 opens one PR from it. It has no 'branch group' structure as such; passed on the single `fix/` branch."
+        },
+        {
+          "text": "The plan cites the bug as `src/notes.js:<line or lines>`, covering line 18 (`copy.splice(id, 1)`)",
+          "passed": false,
+          "evidence": "No `src/notes.js:<line>` citation anywhere. Root cause says only '`remove()` in `src/notes.js` treats the id as an array index' and quotes the function without line numbers; response.md likewise says '`remove()` in `src/notes.js` calls `splice(id, 1)`'."
+        },
+        {
+          "text": "A task adds a test for deleting by id that fails before the fix, and a check runs `npm test` with an explicit pass criterion",
+          "passed": true,
+          "evidence": "Step 2 'Write failing tests first in `tests/notes.test.js` (import `remove`)': 'notes 1, 2, 3 -> `remove(notes, 2)` leaves ids `[1, 3]`' (old code removes index 2 = note 3, so it fails), and 'Run `npm test` and confirm the new tests fail for the expected reason.' Step 5 Verify: '`npm test` passes.' The pass criterion is explicit but weak (no test count)."
+        },
+        {
+          "text": "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections",
+          "passed": false,
+          "evidence": "Line 1 is '# Fix `notes delete <id>` deleting the wrong note' (no 'Plan:', source or date). It has five `## ` sections: Problem, Root cause, Decisions (from questions.md, recommended options), Steps, Out of scope."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "vague-request",
+      "eval_name": "vague-request",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 60.7,
+        "tokens": 43398,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "questions.md asks the user to define the goal or scope of 'better' before any plan is written",
+          "passed": true,
+          "evidence": "questions.md opens: '\"Clunky\" can mean several things, so I need to check a few points before I write the plan.' Q1 '**What feels clunky?**' offers (a) to (d) with a recommendation: 'fix (a), (b) and (c) in this plan. Leave (d) for later, except for one small `edit` command.' The order can't be confirmed without a transcript."
+        },
+        {
+          "text": "No plan contains improvements that the questions didn't offer and the recommended answers didn't choose",
+          "passed": false,
+          "evidence": "PR 2 in the plan contains improvements that no question offered: '`notes --version` prints the version from `package.json`'; '**Safer saves.** Write to `notes.json.tmp`, then rename it over `notes.json`'; '**Tidier `list` output.** Pad ids to the width of the largest id'; '**Docs.** Add a short `README.md`'; moving dispatch into 'a `run(argv, { stdout, stderr, env })` function'; and releases 'Release as 1.2.1' / 'Release as 1.3.0'. The questions only offered (a) to (d), NOTES_FILE, storage, dependencies and the PR split. (`edit` and NOTES_FILE were recommended and are fine.)"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 155.5333,
+        "stddev": 39.727,
+        "min": 113.0,
+        "max": 208.8
+      },
+      "tokens": {
+        "mean": 63833.5,
+        "stddev": 4818.458,
+        "min": 59018,
+        "max": 70569
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.4033,
+        "stddev": 0.2389,
+        "min": 0.0,
+        "max": 0.67
+      },
+      "time_seconds": {
+        "mean": 56.6667,
+        "stddev": 16.6103,
+        "min": 33.0,
+        "max": 82.0
+      },
+      "tokens": {
+        "mean": 43100.3333,
+        "stddev": 2010.2717,
+        "min": 40339,
+        "max": 46336
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.60",
+      "time_seconds": "+98.9",
+      "tokens": "+20733"
+    }
+  },
+  "notes": []
+}

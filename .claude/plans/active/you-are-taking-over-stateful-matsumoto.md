@@ -135,7 +135,8 @@ Planning decisions, not from the sources or the user:
 - **The split logic moves into an exported `splitSkill(skill, git)`** in `scripts/split-released.mjs`, so a Vitest test can check the order of the git commands with a fake `git`, since `git subtree` can't run in this container.
 - **Spec § Steps only the user can do loses "Allow GitHub Actions to create pull requests":** `release.yml` runs release-please with `RELEASE_TOKEN`, not `GITHUB_TOKEN` (`.github/workflows/release.yml`, step `rp`).
 - **Evaluation prompts don't use the `/create-plan` slash command.** The user-level copy in `~/.claude/skills/create-plan` would otherwise load in the without-skill runs. `disable-model-invocation: true` keeps the model from loading it on its own.
-- **The evaluation uses the plugin skill `skill-creator:skill-creator`** by name, not the built-in `anthropic-skills:skill-creator`.
+- **The evaluation uses `anthropic-skills:skill-creator`** (user, 2026-10-23): it is the name the installed skill-creator loads under in this session; `skill-creator:skill-creator` doesn't exist. This replaces every mention of `skill-creator:skill-creator` in T2.5 and T2.6.
+- **Evaluation cases** (user, 2026-10-23): kept in `evals/evals.json` with `assertions`, which the shared check validates, although the loaded skill-creator prefers case folders. Every case uses the fixture `evals/files/notes-cli/`, and `run_instructions` at the top of `evals.json` says how each run sets it up and that runs write their questions to `questions.md` and then continue with the recommended options.
 - **Commit types:** tests and evaluation records use `test(create-plan)`, the version metadata `chore(create-plan)`, the split fix `fix(release)`. Only the three existing `feat(create-plan)` commits count towards the release.
 
 ### Constraints
@@ -394,7 +395,7 @@ docs(repo): complete branch group 1 checks of release setup plan
 - The behavior tests in `skills/create-plan/evals/evals.json` run with skill-creator (T2.6), and `pnpm run check:benchmarks` checks the record.
 - The release can only be checked on GitHub: a dry run in T2.7, the real release in T2.8.
 
-#### [ ] T2.1: Check the plan template's title, sections and task fields
+#### [x] T2.1: Check the plan template's title, sections and task fields
 
 - **Start branch:** `main`, with group 1 merged. Run `git switch feat/create-plan-skill && git rebase main`, then `pnpm install`. If the rebase reports a conflict, abort it, stop and tell the user. `git log --oneline main..HEAD` shows the three `feat(create-plan)` commits.
 - **Files:** `skills/create-plan/tests/plan-template.test.ts` (new).
@@ -468,7 +469,7 @@ The template must keep the title pattern, exactly three top-level
 sections, and the required fields of each task kind.
 ```
 
-#### [ ] T2.2: Add the version metadata and the release-please entry
+#### [x] T2.2: Add the version metadata and the release-please entry
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/SKILL.md:1-6`, `release-please-config.json`.
@@ -503,7 +504,7 @@ updater, and the skill is a release-please package whose first
 release is 0.1.0.
 ```
 
-#### [ ] T2.3: User step: install skill-creator in project scope
+#### [x] T2.3: User step: install skill-creator in project scope
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Instructions:** in `/workspaces/claude-skills`, run `claude plugin marketplace add anthropics/claude-plugins-official --scope project` and `claude plugin install skill-creator@claude-plugins-official --scope project`, then restart Claude Code in `/workspaces/claude-skills`.
@@ -513,7 +514,9 @@ release is 0.1.0.
 
   If either command fails, stop and report its output.
 
-#### [ ] T2.4: Commit the project-scope skill-creator settings
+- note: the agent ran both commands at the user's request (yolo mode, 2026-10-23); both Done when checks passed. The CLI moved `plansDirectory` to the end of `.claude/settings.json`; the agent moved it back so the diff only adds lines. The restart is still the user's, before T2.5 loads `skill-creator:skill-creator`.
+
+#### [x] T2.4: Commit the project-scope skill-creator settings
 
 - **Start branch:** `feat/create-plan-skill`, with the uncommitted `.claude/settings.json` change from T2.3.
 - **Files:** `.claude/settings.json`.
@@ -528,7 +531,7 @@ Every clone gets skill-creator@claude-plugins-official, the plugin
 the skill evaluations use.
 ```
 
-#### [ ] T2.5: Write create-plan's evaluation cases with the user
+#### [x] T2.5: Write create-plan's evaluation cases with the user
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/evals/evals.json` (new); `skills/create-plan/evals/files/` (new, only for fixtures the cases name).
@@ -551,7 +554,7 @@ plan from a spec, a vague request, a plan file outside the repository
 and the don't-ask pressure case.
 ```
 
-#### [ ] T2.6: Run the evaluation and record its benchmark
+#### [x] T2.6: Run the evaluation and record its benchmark
 
 - **Start branch:** `feat/create-plan-skill`.
 - **Files:** `skills/create-plan/evals/benchmark.json` (new), `skills/create-plan/evals/benchmark.meta.json` (new). The run itself is in the ignored `skills/create-plan-workspace/`.
@@ -581,7 +584,11 @@ Records skill-creator iteration <N>: with-skill pass rate <w> against
 
   Replace `<N>`, `<w>` and `<wo>` with the recorded values.
 
-#### [ ] T2.7: Check group 2, push the branch and open its pull request
+- note: iteration 1 scored with-skill 0.888 against 0.333 without; both with-skill failures were assertion wording (several-features: a group that ends with the user's merge step; plan-file-outside-repository: the fixture already sets `plansDirectory`). The user decided (2026-10-23) to reword those two assertions in `evals.json`, in their own commit `test(create-plan): fix two evaluation assertions`, and rerun every case as iteration 2. T2.7's Manual check also expects that commit.
+
+#### [x] T2.7: Check group 2, push the branch and open its pull request
+
+- note: checks passed (2026-10-23): `main..HEAD` shows the three `feat(create-plan)` commits, T2.1, T2.2, T2.4, T2.5, the assertion fix and T2.6; no `skills/create-plan-workspace` file is tracked; after a clean install `pnpm test` passed 30 of 30, `pnpm run check:benchmarks` printed `benchmarks ok: create-plan`, and commitlint exited 0.
 
 - **Start branch:** `feat/create-plan-skill`.
 - **No code changes.** The only commit is the plan tick with the check results. If a check fails, stop and tell the user; don't fix it here.

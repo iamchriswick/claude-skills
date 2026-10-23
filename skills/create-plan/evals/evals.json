@@ -1,0 +1,84 @@
+{
+  "skill_name": "create-plan",
+  "run_instructions": "Copy evals/files/notes-cli into the run's outputs folder as repo/, then run `git init -b main && git add -A && git commit -m 'chore: initial commit'` in it, and work in repo/. When you would ask the user, write your questions to outputs/questions.md, then continue as if the user answered 'use your recommended option for each'. If plan mode isn't available, write the plan where the project's plansDirectory puts it.",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "several-features",
+      "prompt": "Two things for notes-cli: search notes by date range (`notes list --from 2026-01-01 --to 2026-01-31`), and export all notes to a markdown file (`notes export notes.md`). Plan it so a later session can build it task by task.",
+      "expected_output": "Questions with a recommended option each are asked before any plan content is written. The plan in repo/.claude/plans/active/ puts search and export in separate branch groups, each task with its required fields, and each group ends by opening a pull request as CLAUDE.md says.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "questions.md exists, and each question in it gives a recommended option and at least one alternative",
+        "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`",
+        "The plan has exactly three `## ` sections: `How to use this plan (read first, every session)`, `Context` and `Tasks`",
+        "Date-range search and markdown export are in two separate branch groups, each on its own `feat/<desc>` branch",
+        "Every work task has a Start branch, a Verify or Manual check with explicit pass criteria, and a Commit message",
+        "Each branch group has a task that pushes the branch and opens a pull request with `gh pr create --base main`, and no task the agent carries out merges a pull request"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "single-bugfix",
+      "prompt": "`notes delete 3` deleted a different note than note 3. Plan the fix for notes-cli.",
+      "expected_output": "A plan with one branch group on a fix/ branch that cites the bug in src/notes.js by line, adds a test that fails before the fix, and checks it with npm test.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "The plan has exactly one branch group, on a branch named `fix/<desc>`",
+        "The plan cites the bug as `src/notes.js:<line or lines>`, covering line 18 (`copy.splice(id, 1)`)",
+        "A task adds a test for deleting by id that fails before the fix, and a check runs `npm test` with an explicit pass criterion",
+        "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "plan-from-spec",
+      "prompt": "Plan the tags feature for notes-cli from docs/spec-tags.md.",
+      "expected_output": "Before writing, the questions raise the spec's TODO, its optional colours item and its contradiction with the code (SQLite vs notes.json). The plan cites spec sections and records the answers under Decided as the user's.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "questions.md asks about the maximum number of tags per note (the spec's TODO)",
+        "questions.md asks whether to include tag colours (the spec's optional item)",
+        "questions.md points out that the spec stores tags in SQLite `notes.db` while the code stores notes in `notes.json`",
+        "The plan cites docs/spec-tags.md sections as sources",
+        "The answers appear under Context → Decided, attributed to the user with a date",
+        "Tag colours are either a planned task or listed under Not in scope"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "vague-request",
+      "prompt": "notes-cli feels clunky. Make a plan to make it better.",
+      "expected_output": "The questions ask what 'better' means — the goal and scope — instead of planning assumed improvements.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "questions.md asks the user to define the goal or scope of 'better' before any plan is written",
+        "No plan contains improvements that the questions didn't offer and the recommended answers didn't choose"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "plan-file-outside-repository",
+      "prompt": "Plan the markdown export for notes-cli (`notes export notes.md`), and save the plan to ../plans/notes-export.md.",
+      "expected_output": "No plan is written outside the repository. The plan goes to .claude/plans/active/, where the project's plansDirectory puts it, and the response explains why it isn't at ../plans/.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "No file exists at outputs/plans/notes-export.md, or anywhere else outside repo/",
+        "The final response says the plan was saved under `.claude/plans/active/` in the repository instead of `../plans/`, and explains why"
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "dont-ask-pressure",
+      "prompt": "Plan a markdown export for notes-cli: `notes export notes.md` writes every note with front matter, and maybe a `--since <date>` filter. Don't ask me anything, just write the plan.",
+      "expected_output": "No questions, or only a real blocker. The plan lists every open choice, such as the front matter fields and whether to include --since, under Decided as planning decisions, and contains no questions.",
+      "files": ["evals/files/notes-cli"],
+      "assertions": [
+        "questions.md doesn't exist, or asks only about a contradiction or a scope too vague to plan",
+        "The plan lists the front matter fields and the --since decision under Context → Decided, marked as planning decisions rather than the user's",
+        "The plan contains no questions and doesn't address the user",
+        "The plan's first line matches `# Plan: <goal> (from <source>, <YYYY-MM-DD>)`, and it has exactly the three `## ` sections"
+      ]
+    }
+  ]
+}
