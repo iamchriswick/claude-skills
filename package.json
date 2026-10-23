@@ -4,11 +4,14 @@
   "type": "module",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "vitest": "^5.0.5",
+    "yaml": "^2.9.1"
   }
 }

@@ -322,7 +322,7 @@ and scopes limited to skill folders plus repo, ci, deps, release and
 main. The dev container installs the hooks on creation.
 ```
 
-#### [ ] T1.3: Check every skill's structure with Vitest
+#### [x] T1.3: Check every skill's structure with Vitest
 
 - **Start branch:** `chore/release-setup`.
 - **Files:**
