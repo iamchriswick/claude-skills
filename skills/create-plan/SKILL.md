@@ -96,7 +96,10 @@ Follow `plan-template.md`. Its structure is binding; its wording is illustrative
 
   Mark planning decisions as yours, not as decisions from the sources or the user. If the user's answer changes a decision in a named document, record the final approach under Decided and tell the user that document needs the same change. Cite the sources and `CLAUDE.md`; don't copy them.
 - **Tasks.** Use the template's headings: `#### [ ] T<group>.<n>: <outcome>`, user steps, and Detail tasks.
-  - **Fields.** Use the template's fields in the template's order.
+  - **Fields.** Use the template's fields in the template's order, and only the ones that apply. Each kind of task has a minimum:
+    - **Work task:** a **Start branch**, at least one check with explicit pass criteria (**Verify** or **Manual check**), and either a **Commit message** or, directly under Start branch, a line saying the task has no commit of its own.
+    - **User step:** **Start branch**, **Instructions** and **Done when**.
+    - **Detail task:** **Start branch**, **Do** and a **Commit message**.
   - **Task size.** Make a task the smallest unit with its own check that a reviewer could approve or reject on its own. Setup, config and docs go into the task that needs them.
   - **Group ending.** Each group ends with a task that checks the group, merges it and pushes it, as `CLAUDE.md` sets out.
   - **Plan file.** The first task's commit adds the plan file. The plan's last task moves the file to `done/`.
