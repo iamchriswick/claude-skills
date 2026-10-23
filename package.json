@@ -5,7 +5,9 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "prepare": "husky",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:benchmarks": "node scripts/check-benchmarks.mjs",
+    "eval:record": "node scripts/eval-record.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",

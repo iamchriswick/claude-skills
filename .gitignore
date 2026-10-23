@@ -1,3 +1,5 @@
 .devcontainer/devcontainer-lock.json
 drafts/
 node_modules/
+skills/*-workspace/
+**/evals/results/

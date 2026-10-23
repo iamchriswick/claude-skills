@@ -390,7 +390,9 @@ name matching its folder, a description of at most 1024 characters,
 existing link targets and a valid evals/evals.json.
 ```
 
-#### [ ] T1.4: Gate skill changes on a recorded, passing benchmark
+#### [x] T1.4: Gate skill changes on a recorded, passing benchmark
+
+note: `scripts/check-benchmarks.mjs` also exports `benchmarkErrors(name, benchmark)`, the format and pass-rate checks that `eval-record.mjs` reuses, so both apply the same rules.
 
 - **Start branch:** `chore/release-setup`.
 - **Files:**
