@@ -692,7 +692,9 @@ Records the GitHub flow, branch and commit formats, commands, the
 skill evaluation gate and the release rules for agents.
 ```
 
-#### [ ] T1.8: Check group 1, push the branch and open its pull request
+#### [x] T1.8: Check group 1, push the branch and open its pull request
+
+note: checks on 2026-10-23: the clean install exited 0 and ran `husky`; `pnpm test` passed 5 files and 16 tests; `pnpm run check:benchmarks` printed `no skill changes`; `pnpm exec commitlint --from main --to HEAD` exited 0 over 9 commits.
 
 - **Start branch:** `chore/release-setup`.
 - **No code changes.** The only commit is the plan tick with the check results. If a check fails, stop and tell the user; don't fix it here.
