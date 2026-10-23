@@ -3,6 +3,8 @@ name: create-plan
 description: Use when the user asks to create or detail a plan for multi-step work (one or several features, phases or fixes) that will be carried out task by task across sessions, grouped by branch.
 disable-model-invocation: true
 argument-hint: "[what to plan, or the documents to plan from]"
+metadata:
+  version: "0.1.0" # x-release-please-version
 ---
 
 # Create a plan
