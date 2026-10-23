@@ -1,0 +1,30 @@
+name: release
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+      - id: skills
+        run: |
+          if ls skills/*/SKILL.md >/dev/null 2>&1; then echo "any=true" >> "$GITHUB_OUTPUT"; else echo "any=false" >> "$GITHUB_OUTPUT"; fi
+      - id: rp
+        if: steps.skills.outputs.any == 'true'
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - name: Split released skills
+        if: steps.rp.outputs.releases_created == 'true'
+        env:
+          RP_OUTPUTS: ${{ toJSON(steps.rp.outputs) }}
+        run: node scripts/split-released.mjs
