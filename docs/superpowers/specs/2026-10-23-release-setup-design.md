@@ -63,7 +63,8 @@ Every skill in `skills/<skill-name>/` is developed, tested and released on its o
   - `package.json`: `private: true`, `packageManager` pinned to the pnpm version in use, dev dependencies only, and the scripts `prepare: husky` and `test: vitest run`;
   - `pnpm-lock.yaml`;
   - `commitlint.config.js`: extends `@commitlint/config-conventional` and adds the dynamic `scope-enum`;
-  - `.husky/commit-msg`: `pnpm exec commitlint --edit "$1"`.
+  - `.husky/commit-msg`: `pnpm exec commitlint --edit "$1"`;
+  - `.husky/pre-push`: `node scripts/check-benchmarks.mjs`, the same benchmark check CI runs. A branch with a skill change that hasn't been evaluated can't be pushed.
 - **Dev container:** `postCreateCommand: pnpm install`, so the hook is active in every new container.
 - **Version metadata in each skill:**
   - `SKILL.md` frontmatter carries `metadata.version`. release-please updates it through a generic `extra-files` entry marked `x-release-please-version`.
@@ -105,8 +106,11 @@ The tests travel with the skill: into the subtree split, into `npx skills add` i
 **Behavior tests (skill-creator):**
 - Written in `evals/evals.json`: realistic prompts, expected output, fixture files and assertions.
 - Run in this repository, in a normal Claude Code session, with the `skill-creator` plugin (`skill-creator@claude-plugins-official`). Each case runs once with the skill and once without it.
-- **When:** before a skill's release, and whenever the skill's files change.
-- **How the result is recorded:** the run's `benchmark.json` is copied to `skills/<skill-name>/evals/benchmark.json`. `benchmark.meta.json` stores:
+- **When:** as the last step before merging any branch that changes `skills/<skill-name>/`. The user starts it (`evaluate my <skill-name> skill with skill-creator`), or the agent asks the user whether to run it. The agent never starts an evaluation on its own.
+- **Two phases:**
+  1. **Writing test cases with the user.** The plugin walks through the cases in `evals/evals.json`. This happens the first time a skill is evaluated, and when a change adds behavior the existing cases don't cover.
+  2. **Running the loop.** The plugin runs, grades and opens the review viewer. If the result isn't good enough, the skill is improved and the loop runs again.
+- **Recording the result:** `pnpm eval:record <skill-name> <iteration-dir>` copies the run's `benchmark.json` to `skills/<skill-name>/evals/benchmark.json` and writes `benchmark.meta.json`. The agent commits both. `benchmark.meta.json` stores:
   - `skill_sha256`: a hash over every file in the skill folder except `evals/`, `tests/`, `CHANGELOG.md` and the `metadata.version` line;
   - the run date and the skill-creator iteration number;
   - the pass threshold the run was held to.
@@ -149,7 +153,7 @@ A root `CLAUDE.md` records the conventions agents follow here, so create-plan an
 - `main` is the base branch, and the branch names and commit format above apply;
 - PRs only, merged with merge commits, and `main` is protected;
 - the commands: `pnpm install`, `pnpm test`, and the benchmark check;
-- the skill-creator eval step before a release;
+- the agent never opens or merges a PR for a branch that changes a skill until that skill has been evaluated. When the user says the branch is ready to merge, the agent asks whether to run `evaluate my <skill-name> skill with skill-creator`. It never starts an evaluation on its own, and records the result with `pnpm eval:record`;
 - the rule that the eval workspace (`skills/*-workspace/`) is never committed.
 
 ### Ignored files
