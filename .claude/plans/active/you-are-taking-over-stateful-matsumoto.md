@@ -586,7 +586,9 @@ Records skill-creator iteration <N>: with-skill pass rate <w> against
 
 - note: iteration 1 scored with-skill 0.888 against 0.333 without; both with-skill failures were assertion wording (several-features: a group that ends with the user's merge step; plan-file-outside-repository: the fixture already sets `plansDirectory`). The user decided (2026-10-23) to reword those two assertions in `evals.json`, in their own commit `test(create-plan): fix two evaluation assertions`, and rerun every case as iteration 2. T2.7's Manual check also expects that commit.
 
-#### [ ] T2.7: Check group 2, push the branch and open its pull request
+#### [x] T2.7: Check group 2, push the branch and open its pull request
+
+- note: checks passed (2026-10-23): `main..HEAD` shows the three `feat(create-plan)` commits, T2.1, T2.2, T2.4, T2.5, the assertion fix and T2.6; no `skills/create-plan-workspace` file is tracked; after a clean install `pnpm test` passed 30 of 30, `pnpm run check:benchmarks` printed `benchmarks ok: create-plan`, and commitlint exited 0.
 
 - **Start branch:** `feat/create-plan-skill`.
 - **No code changes.** The only commit is the plan tick with the check results. If a check fails, stop and tell the user; don't fix it here.
