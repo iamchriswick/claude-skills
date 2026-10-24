@@ -72,9 +72,36 @@ Whether the plugin's CI checks that each vendored `skills/<skill>/` matches exac
 - how much the plugin's version changes when a skill version changes. Discussed: as much as the skill changed, so a skill `fix` → patch, a skill `feat` → minor, a breaking skill change → major;
 - whether the plugin's changelog lists the pinned skill versions per release.
 
+**Recommended, not decided:** release-please in its normal single-component mode.
+- It collects releasable commits in one release PR: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major. Commits of type `chore`, `ci`, `build`, `docs` and `test` don't bump the version.
+- The release PR updates `version` in `.claude-plugin/plugin.json` and `CHANGELOG.md`. Merging it is the release.
+- A skill update's commit type sets how much the plugin's version changes.
+- Unverified: whether release-please's JSON updater (`extra-files` with `jsonpath: $.version`) updates `.claude-plugin/plugin.json`.
+
 ### 7. Tests and evals inside the plugin
 
 A split brings each skill's `tests/` and `evals/`, including fixture projects with their own `.claude/` folder, as in `create-plan`'s `evals/files/notes-cli/`. Open: whether they ship inside the plugin as they are, or are removed when skills are vendored.
+
+### 8. Branch model
+
+How changes reach the plugin's `main`.
+
+**Fact that bears on it.** If `.claude-plugin/plugin.json` sets `version`, Claude Code keeps users who already have the plugin on their cached copy until that string changes. The Plugin loading reference, § Versions and updates, says: "a manifest that pins `"version": "1.0.0"` keeps every user on the cached copy until its author changes the string, however many commits they push". So merges to `main` reach existing users only through a release.
+
+**Recommended, not decided:** only `main`, with no `dev` branch.
+- Branches are cut from `main` with Conventional Branch names.
+- Changes to what users get, meaning `skills/` and the components `plugin.json` declares, go in through a PR with CI.
+- Tooling, CI and docs are pushed directly, as in `claude-skills`.
+- PRs are merged with merge commits, which keeps the per-task commits.
+- A `dev` branch is unnecessary because the pinned `version` already holds changes back from existing users.
+
+**Reference.** `obra/superpowers`, checked on 2026-10-24:
+- work branches go into `dev` through PRs, as merge commits (40 of the last 47 merged PRs);
+- each release is one PR from `dev` into `main`, usually squashed (`Release vX.Y.Z: …`);
+- small fixes sometimes go straight into `main` through a PR (for example #2049 and #2570);
+- no commit on `main` arrived without a PR.
+
+**Limit.** The cached-copy rule covers existing users only. A fresh install takes the code as it is on `main` at that moment, so a merged but unreleased change to `skills/` or other plugin components would reach new installs under the old version number. Unverified: whether pointing the marketplace entry at a specific `ref` or commit closes that gap.
 
 ## Known gap, accepted
 
