@@ -72,9 +72,9 @@ Whether the plugin's CI checks that each vendored `skills/<skill>/` matches exac
 - how much the plugin's version changes when a skill version changes. Discussed: as much as the skill changed, so a skill `fix` → patch, a skill `feat` → minor, a breaking skill change → major;
 - whether the plugin's changelog lists the pinned skill versions per release.
 
-**Recommended, not decided:** release-please in its normal single-component mode.
-- It collects releasable commits in one release PR: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major. Commits of type `chore`, `ci`, `build`, `docs` and `test` don't bump the version.
-- The release PR updates `version` in `.claude-plugin/plugin.json` and `CHANGELOG.md`. Merging it is the release.
+**Recommended, not decided:** release-please in its normal single-component mode, running on `develop` (see item 8).
+- It collects releasable commits in one release PR into `develop`: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major. Commits of type `chore`, `ci`, `build`, `docs` and `test` don't bump the version.
+- The release PR updates `version` in `.claude-plugin/plugin.json` and `CHANGELOG.md`. Merging it is the release: it creates the tag `vX.Y.Z`, and `main` is fast-forwarded to it.
 - A skill update's commit type sets how much the plugin's version changes.
 - Unverified: whether release-please's JSON updater (`extra-files` with `jsonpath: $.version`) updates `.claude-plugin/plugin.json`.
 
@@ -84,16 +84,32 @@ A split brings each skill's `tests/` and `evals/`, including fixture projects wi
 
 ### 8. Branch model
 
-How changes reach the plugin's `main`.
+How changes reach users, and which branch installs come from.
 
-**Fact that bears on it.** If `.claude-plugin/plugin.json` sets `version`, Claude Code keeps users who already have the plugin on their cached copy until that string changes. The Plugin loading reference, § Versions and updates, says: "a manifest that pins `"version": "1.0.0"` keeps every user on the cached copy until its author changes the string, however many commits they push". So merges to `main` reach existing users only through a release.
+**Facts that bear on it** (Plugin loading reference, § Versions and updates; Marketplace reference, § Plugin sources and § Marketplace sources):
+- `claude plugin marketplace add iamchriswick/<plugin-repo>` registers a `github` marketplace source whose `ref` defaults to the repository's default branch. A plugin listed with a relative path is installed from that clone. Claude Code doesn't read git tags or GitHub releases.
+- If `.claude-plugin/plugin.json` sets `version`, users who already have the plugin stay on their cached copy until that string changes: "a manifest that pins `"version": "1.0.0"` keeps every user on the cached copy until its author changes the string, however many commits they push".
+- A fresh install has no cached copy, so it gets whatever the default branch holds at that moment.
 
-**Recommended, not decided:** only `main`, with no `dev` branch.
-- Branches are cut from `main` with Conventional Branch names.
-- Changes to what users get, meaning `skills/` and the components `plugin.json` declares, go in through a PR with CI.
-- Tooling, CI and docs are pushed directly, as in `claude-skills`.
+So whatever lands on the default branch reaches new installs at once, released or not.
+
+**Recommended, not decided:** `main` is the release branch and stays the default branch. `develop` is where the work happens.
+- Work branches are cut from `develop` with Conventional Branch names.
+- Changes to what users get, meaning `skills/` and the components `plugin.json` declares, go into `develop` through a PR with CI. Tooling, CI and docs are pushed to `develop` directly.
 - PRs are merged with merge commits, which keeps the per-task commits.
-- A `dev` branch is unnecessary because the pinned `version` already holds changes back from existing users.
+- release-please runs on `develop` (`target-branch: develop`) and opens its release PR into `develop`. Merging it is the release and creates the tag `vX.Y.Z` (item 6).
+- The release workflow then fast-forwards `main` to that tag. Nothing else ever lands on `main`, so `main` always equals the latest release.
+- `claude plugin marketplace add iamchriswick/<plugin-repo>` therefore always installs the latest release. Unreleased work on `develop` never reaches a fresh install.
+
+**Installing a specific version.** The Marketplace reference documents `owner/repo@ref` and `owner/repo#ref` for `claude plugin marketplace add`. So `claude plugin marketplace add iamchriswick/<plugin-repo>@v0.1.0` installs the plugin as it was at release `v0.1.0`, even after `v0.2.0` exists.
+- The user stays on that version and gets no updates. Changing versions means removing the marketplace and adding it again with another tag.
+- Each marketplace name can be registered only once per user, so two versions can't be installed side by side.
+- It works for every release tag, because each one points at a commit on `main` that contains `marketplace.json` and the plugin.
+
+Unverified:
+- that release-please works with `target-branch: develop` in this setup;
+- that the release workflow's fast-forward push to `main` gets through the repository's rulesets with its token;
+- that installing with `@<tag>` works as documented.
 
 **Reference.** `obra/superpowers`, checked on 2026-10-24:
 - work branches go into `dev` through PRs, as merge commits (40 of the last 47 merged PRs);
@@ -101,7 +117,12 @@ How changes reach the plugin's `main`.
 - small fixes sometimes go straight into `main` through a PR (for example #2049 and #2570);
 - no commit on `main` arrived without a PR.
 
-**Limit.** The cached-copy rule covers existing users only. A fresh install takes the code as it is on `main` at that moment, so a merged but unreleased change to `skills/` or other plugin components would reach new installs under the old version number. Unverified: whether pointing the marketplace entry at a specific `ref` or commit closes that gap.
+The recommendation follows the same idea: `main` is for releases only. Two differences: releases reach `main` by a fast-forward to the release tag instead of a squashed PR, and release-please creates the version.
+
+**Alternatives considered:**
+- **Only `main`, no `develop`:** fresh installs would get merged but unreleased changes under the old version number.
+- **Pin the marketplace entry** with `"source": { "source": "github", "repo": …, "ref": "vX.Y.Z", "sha": … }`: the entry would need updating with every release.
+- **Users pin the marketplace with `@<tag>`:** they never get updates.
 
 ## Known gap, accepted
 
@@ -125,6 +146,8 @@ This is an option on top of the decision not to retest. It doesn't replace that 
 
 - `docs/superpowers/specs/2026-10-23-release-setup-design.md` in `iamchriswick/claude-skills`
 - `git ls-tree -r split/create-plan/v0.1.0`, `git ls-remote origin` and `gh release list`, run on 2026-10-24
-- [Plugin loading reference, Claude Code Docs](https://code.claude.com/docs/en/plugins/loading.md), for marketplace source types including `git-subdir`
+- [Plugin loading reference, Claude Code Docs](https://code.claude.com/docs/en/plugins/loading.md), for marketplace source types including `git-subdir`, and for how a pinned `version` holds users on their cached copy
+- [Marketplace reference, Claude Code Docs](https://code.claude.com/docs/en/plugins/marketplace-reference.md), for plugin and marketplace sources, `ref`/`sha`, and `owner/repo@ref`
+- `obra/superpowers` on GitHub, branches, PRs and `main`'s history, checked with `gh api` on 2026-10-24
 - [Skills: run evals with skill-creator, Claude Code Docs](https://code.claude.com/docs/en/skills#run-evals-with-skill-creator)
 - [Evaluating skill output quality, agentskills.io](https://agentskills.io/skill-creation/evaluating-skills)
