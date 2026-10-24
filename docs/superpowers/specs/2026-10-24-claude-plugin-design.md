@@ -27,6 +27,7 @@ These are facts checked against `iamchriswick/claude-skills` on 2026-10-24.
   - the branch `split/<skill-name>` and the tag `split/<skill-name>/vX.Y.Z`, for example `split/create-plan` and `split/create-plan/v0.1.0`, both at `ecfd25d`;
   - created by `git subtree split --prefix=skills/<skill-name>` in `claude-skills`' release workflow;
   - only that workflow writes to split branches and tags (release setup spec, § 1).
+- **Protection:** release tags (`*-v*`), split tags (`split/**`) and split branches (`split/**`) are protected against updates and deletion. GitHub's rulesets "release tags" and "split branches" enforce this, with bypass only for the Repository admin role, which the release workflow acts as through `RELEASE_TOKEN`. A pinned split tag therefore can't move or disappear by accident. Checked with `gh api repos/iamchriswick/claude-skills/rulesets` on 2026-10-24.
 - **What a split contains:** the skill folder at its root, with nothing else from the repository. For `create-plan` 0.1.0:
   - `SKILL.md`, `plan-template.md`, `CHANGELOG.md`;
   - `tests/plan-template.test.ts` (Vitest);
