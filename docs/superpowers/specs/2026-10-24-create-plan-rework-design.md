@@ -100,7 +100,7 @@ The agent warns the user that the plan relies on `CLAUDE.md` content the skill e
 
 ### CLAUDE.md exists
 
-The planning agent checks with the user, through `AskUserQuestion`, what the skill expects `CLAUDE.md` to contain. It then makes "update `CLAUDE.md`" the plan's **first task**, and that task says what to change, based on what the skill expects and on the user's answers.
+The planning agent checks with the user, through `AskUserQuestion`, what the skill expects `CLAUDE.md` to contain. If anything needs to change, it makes "update `CLAUDE.md`" the plan's **first task**, and that task says what to change, based on what the skill expects and on the user's answers. If `CLAUDE.md` already holds everything the skill expects, no edit is needed and the plan gets no such task.
 
 ### Shared rules
 
@@ -138,8 +138,3 @@ The planning agent checks with the user, through `AskUserQuestion`, what the ski
 - `gh` and `gh auth login`.
 - `/auto-mode-setup`.
 - Any commit, or any decision about what gets committed, by the skill.
-
-## Open points
-
-1. **CLAUDE.md exists and already holds everything the skill expects.** Does the plan still get an "update `CLAUDE.md`" first task, or no first task?
-2. **CLAUDE.md missing, with Run `/init`.** `/init` runs only in the first task, so the conventions the plan needs aren't in `CLAUDE.md` while planning. These are branch names, commit format, merge and push, and the install, check and test commands. Should the planning agent ask for them in its Q&A, record them under Context → Decided, and have the first task add them to `CLAUDE.md` after `/init`?
